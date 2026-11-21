@@ -253,6 +253,14 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
           Meus Materiais
         </button>
+        <button id="nav-avaliacao" data-page="avaliacao" class="nav-item hidden w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6m-6 4h6m-6 4h6m-6 4h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"></path></svg>
+          Avaliação Probatória
+        </button>
+        <button id="nav-rh" data-page="rh" class="nav-item hidden w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87M12 12a4 4 0 100-8 4 4 0 000 8zm7 0a3 3 0 100-6"></path></svg>
+          Painel do RH
+        </button>
         <button data-page="regimento" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           Regimento SMI
@@ -384,6 +392,161 @@
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="materials-grid"></div>
+      </section>
+
+      <!-- AVALIAÇÃO PROBATÓRIA -->
+      <section id="page-avaliacao" class="page hidden fade-in">
+        <header class="mb-8">
+          <p class="text-cyan-400 text-sm font-semibold mono mb-1">GESTÃO DE PESSOAS</p>
+          <h1 class="text-3xl font-bold">Avaliação Probatória</h1>
+          <p class="text-slate-400 mt-1">Registro individual de desempenho do Agente em período probatório.</p>
+        </header>
+
+        <div class="glass-panel rounded-2xl p-5 mb-6 border border-cyan-500/20">
+          <div class="flex items-start gap-3">
+            <span class="w-10 h-10 shrink-0 rounded-xl bg-cyan-500/10 text-cyan-300 flex items-center justify-center font-bold">i</span>
+            <div>
+              <h3 class="font-semibold text-white">Registro oficial da avaliação</h3>
+              <p class="text-sm text-slate-400 mt-1">Preencha os dados do AGP e atribua notas de 1 a 5 aos cinco critérios. O sistema calcula a média e o parecer seguindo a planilha de avaliação do SMI. O registro fica disponível ao RH, com identificação do avaliador e data.</p>
+            </div>
+          </div>
+        </div>
+
+        <form id="probation-evaluation-form" class="space-y-6">
+          <div class="glass-panel rounded-2xl p-6">
+            <div class="flex items-center justify-between gap-4 mb-5">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-cyan-400 mono">Etapa 01</p>
+                <h2 class="text-xl font-bold">Identificação do agente</h2>
+              </div>
+              <span class="text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">Dados obrigatórios</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="eval-agp-name" class="block text-sm text-slate-400 mb-2">Nome do agente probatório</label>
+                <input id="eval-agp-name" required maxlength="140" placeholder="Nome completo do AGP" class="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50">
+              </div>
+              <div>
+                <label for="eval-rg" class="block text-sm text-slate-400 mb-2">RG / matrícula</label>
+                <input id="eval-rg" required maxlength="40" placeholder="Identificação funcional" class="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50">
+              </div>
+              <div>
+                <label for="eval-courses" class="block text-sm text-slate-400 mb-2">Cursos realizados</label>
+                <input id="eval-courses" maxlength="500" placeholder="Ex.: Dosimetria, Modulação" class="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50">
+              </div>
+              <div>
+                <label for="eval-cpd" class="block text-sm text-slate-400 mb-2">Certificação do CPD</label>
+                <select id="eval-cpd" required class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-cyan-500/50">
+                  <option value="">Selecione</option>
+                  <option value="SIM">SIM</option>
+                  <option value="NÃO">NÃO</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6">
+            <div class="flex items-center justify-between gap-4 mb-5">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-cyan-400 mono">Etapa 02</p>
+                <h2 class="text-xl font-bold">Critérios de avaliação</h2>
+                <p class="text-sm text-slate-400 mt-1">Selecione uma nota de 1 a 5 para cada critério.</p>
+              </div>
+              <span class="hidden sm:inline-flex text-xs px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300">Escala de 1 a 5</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="eval-posture" class="block text-sm font-semibold text-slate-200 mb-2">Postura profissional</label>
+                <select id="eval-posture" data-score required class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-cyan-500/50">
+                  <option value="">Selecione a nota</option><option value="1">1 — Insuficiente</option><option value="2">2 — Abaixo do esperado</option><option value="3">3 — Adequado</option><option value="4">4 — Muito bom</option><option value="5">5 — Excelente</option>
+                </select>
+              </div>
+              <div>
+                <label for="eval-teamwork" class="block text-sm font-semibold text-slate-200 mb-2">Trabalho em equipe</label>
+                <select id="eval-teamwork" data-score required class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-cyan-500/50">
+                  <option value="">Selecione a nota</option><option value="1">1 — Insuficiente</option><option value="2">2 — Abaixo do esperado</option><option value="3">3 — Adequado</option><option value="4">4 — Muito bom</option><option value="5">5 — Excelente</option>
+                </select>
+              </div>
+              <div>
+                <label for="eval-proactivity" class="block text-sm font-semibold text-slate-200 mb-2">Proatividade</label>
+                <select id="eval-proactivity" data-score required class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-cyan-500/50">
+                  <option value="">Selecione a nota</option><option value="1">1 — Insuficiente</option><option value="2">2 — Abaixo do esperado</option><option value="3">3 — Adequado</option><option value="4">4 — Muito bom</option><option value="5">5 — Excelente</option>
+                </select>
+              </div>
+              <div>
+                <label for="eval-modulation" class="block text-sm font-semibold text-slate-200 mb-2">Modulação prática</label>
+                <select id="eval-modulation" data-score required class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-cyan-500/50">
+                  <option value="">Selecione a nota</option><option value="1">1 — Insuficiente</option><option value="2">2 — Abaixo do esperado</option><option value="3">3 — Adequado</option><option value="4">4 — Muito bom</option><option value="5">5 — Excelente</option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label for="eval-technical" class="block text-sm font-semibold text-slate-200 mb-2">Conhecimento técnico</label>
+                <select id="eval-technical" data-score required class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-cyan-500/50">
+                  <option value="">Selecione a nota</option><option value="1">1 — Insuficiente</option><option value="2">2 — Abaixo do esperado</option><option value="3">3 — Adequado</option><option value="4">4 — Muito bom</option><option value="5">5 — Excelente</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="glass-panel rounded-2xl p-6 lg:col-span-2">
+              <p class="text-xs uppercase tracking-wider text-cyan-400 mono mb-2">Etapa 03</p>
+              <h2 class="text-xl font-bold mb-4">Observações do avaliador</h2>
+              <textarea id="eval-observations" rows="5" maxlength="4000" placeholder="Registre fatos, pontos fortes, pontos de atenção e justificativas que ajudem o RH a compreender a avaliação." class="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50"></textarea>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 border border-cyan-500/20">
+              <p class="text-xs uppercase tracking-wider text-cyan-400 mono mb-2">Resultado automático</p>
+              <p class="text-sm text-slate-400">Média dos cinco critérios</p>
+              <p id="eval-preview-average" class="text-4xl font-bold text-white mt-2">—</p>
+              <div id="eval-preview-verdict" class="mt-4 px-3 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300">Preencha as cinco notas para visualizar o parecer.</div>
+              <p class="text-xs text-slate-500 mt-4">O parecer segue a regra já utilizada na planilha: média ≥ 4; média ≥ 3; abaixo de 3.</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-end gap-3">
+            <button type="reset" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-medium">Limpar formulário</button>
+            <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold shadow-lg shadow-cyan-900/20">Registrar avaliação oficial</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- PAINEL DO RH -->
+      <section id="page-rh" class="page hidden fade-in">
+        <header class="mb-8">
+          <p class="text-emerald-400 text-sm font-semibold mono mb-1">RECURSOS HUMANOS</p>
+          <h1 class="text-3xl font-bold">Acompanhamento Probatório</h1>
+          <p class="text-slate-400 mt-1">Consulta centralizada dos AGPs avaliados, pareceres e responsáveis pelos registros.</p>
+        </header>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+          <div class="metric-card rounded-2xl p-5"><p class="text-sm text-slate-400">Avaliações registradas</p><p id="rh-count-total" class="text-3xl font-bold mt-2">0</p></div>
+          <div class="metric-card rounded-2xl p-5"><p class="text-sm text-slate-400">Aptos para efetivação</p><p id="rh-count-apt" class="text-3xl font-bold text-emerald-400 mt-2">0</p></div>
+          <div class="metric-card rounded-2xl p-5"><p class="text-sm text-slate-400">Aptos com ressalvas</p><p id="rh-count-res" class="text-3xl font-bold text-amber-400 mt-2">0</p></div>
+          <div class="metric-card rounded-2xl p-5"><p class="text-sm text-slate-400">Não aptos</p><p id="rh-count-no" class="text-3xl font-bold text-red-400 mt-2">0</p></div>
+        </div>
+        <div class="glass-panel rounded-2xl p-5 mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-bold">Registros dos agentes probatórios</h2>
+            <p class="text-sm text-slate-400">Cada avaliação mantém o nome do avaliador, data e histórico de criação.</p>
+          </div>
+          <div class="flex gap-2">
+            <input id="rh-evaluation-search" type="search" placeholder="Buscar por nome ou RG..." class="w-full md:w-72 px-4 py-2.5 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50">
+            <button id="rh-refresh-button" type="button" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200">Atualizar</button>
+          </div>
+        </div>
+        <div class="glass-panel rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[1050px] text-left">
+              <thead class="bg-white/5 text-xs uppercase tracking-wider text-slate-400">
+                <tr>
+                  <th class="py-4 px-4">Agente probatório</th><th class="py-4 px-4">RG</th><th class="py-4 px-4">CPD</th><th class="py-4 px-4">Média</th><th class="py-4 px-4">Parecer final</th><th class="py-4 px-4">Avaliador</th><th class="py-4 px-4">Data</th><th class="py-4 px-4">Detalhes</th>
+                </tr>
+              </thead>
+              <tbody id="rh-evaluations-table">
+                <tr><td colspan="8" class="py-10 text-center text-slate-500">Carregue os registros para visualizar as avaliações.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
       <!-- REGIMENTO -->
@@ -518,6 +681,22 @@
               </button>
             </div>
           </form>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-6 mt-6 border border-emerald-500/20">
+          <div class="mb-5">
+            <p class="text-xs uppercase tracking-wider text-emerald-400 mono mb-1">Permissões</p>
+            <h3 class="text-lg font-bold">Acesso ao painel do RH</h3>
+            <p class="text-sm text-slate-400 mt-1">Libere a consulta das avaliações para profissionais do RH informando o ID de usuário do Discord. A concessão e a revogação ficam registradas.</p>
+          </div>
+          <form id="rh-access-form" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+            <input id="rh-access-name" required maxlength="140" placeholder="Nome do profissional" class="px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50">
+            <input id="rh-access-id" required inputmode="numeric" pattern="[0-9]{17,20}" placeholder="ID do Discord (17 a 20 números)" class="px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50">
+            <button type="submit" class="px-4 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-semibold">Liberar acesso</button>
+          </form>
+          <div id="rh-access-list" class="space-y-2">
+            <p class="text-sm text-slate-500">Carregando usuários autorizados...</p>
+          </div>
         </div>
 
         <div class="glass-panel rounded-2xl p-6">
@@ -680,8 +859,175 @@
     };
 
     let isCurrentUserAdmin = false;
+    let isCurrentUserHR = false;
+    let canEvaluate = false;
     let currentUser = null;
     let accessToken = null;
+    let cachedRHEvaluations = [];
+
+    // ===================== API DO PORTAL / AVALIAÇÕES =====================
+    async function apiRequest(path, options = {}) {
+      if (!accessToken) throw new Error("Sua sessão expirou. Entre novamente pelo Discord.");
+      const headers = { Authorization: accessToken, ...(options.headers || {}) };
+      if (options.body) headers["Content-Type"] = "application/json";
+      const response = await fetch(path, {
+        method: options.method || "GET",
+        headers,
+        body: options.body ? JSON.stringify(options.body) : undefined
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Falha ao comunicar com o portal.");
+      return data;
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[char]));
+    }
+
+    function calculateEvaluationPreview() {
+      const values = Array.from(document.querySelectorAll("[data-score]")).map(el => Number(el.value));
+      const averageEl = document.getElementById("eval-preview-average");
+      const verdictEl = document.getElementById("eval-preview-verdict");
+      if (values.length !== 5 || values.some(value => !Number.isInteger(value) || value < 1 || value > 5)) {
+        averageEl.textContent = "—";
+        verdictEl.textContent = "Preencha as cinco notas para visualizar o parecer.";
+        verdictEl.className = "mt-4 px-3 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300";
+        return;
+      }
+      const average = values.reduce((sum, value) => sum + value, 0) / 5;
+      const verdict = average >= 4 ? "APTO PARA EFETIVAÇÃO" : average >= 3 ? "APTO COM RESSALVAS" : "NÃO APTO PARA EFETIVAÇÃO";
+      averageEl.textContent = average.toFixed(2).replace(".", ",");
+      const style = average >= 4
+        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+        : average >= 3
+          ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+          : "bg-red-500/10 border-red-500/30 text-red-300";
+      verdictEl.textContent = verdict;
+      verdictEl.className = "mt-4 px-3 py-3 rounded-xl border text-sm font-semibold " + style;
+    }
+
+    function verdictBadge(verdict) {
+      if (verdict === "APTO PARA EFETIVAÇÃO") return "bg-emerald-500/10 text-emerald-300 border-emerald-500/30";
+      if (verdict === "APTO COM RESSALVAS") return "bg-amber-500/10 text-amber-300 border-amber-500/30";
+      return "bg-red-500/10 text-red-300 border-red-500/30";
+    }
+
+    function renderRHEvaluations() {
+      const query = (document.getElementById("rh-evaluation-search")?.value || "").trim().toLowerCase();
+      const rows = cachedRHEvaluations.filter(item =>
+        String(item.agp_name).toLowerCase().includes(query) || String(item.rg).toLowerCase().includes(query)
+      );
+      const tbody = document.getElementById("rh-evaluations-table");
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-10 text-center text-slate-500">Nenhuma avaliação encontrada.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(item => {
+        const cpd = Number(item.cpd_certified) === 1 ? "SIM" : "NÃO";
+        return '<tr class="border-t border-white/5 hover:bg-white/[0.03]">' +
+          '<td class="py-4 px-4"><p class="font-semibold text-white">' + escapeHTML(item.agp_name) + '</p><p class="text-xs text-slate-500 mt-1">' + escapeHTML(item.courses || "Sem cursos informados") + '</p></td>' +
+          '<td class="py-4 px-4 text-sm text-slate-300 mono">' + escapeHTML(item.rg) + '</td>' +
+          '<td class="py-4 px-4 text-sm ' + (cpd === "SIM" ? "text-emerald-300" : "text-amber-300") + '">' + cpd + '</td>' +
+          '<td class="py-4 px-4 text-lg font-bold text-white">' + Number(item.average).toFixed(2).replace(".", ",") + '</td>' +
+          '<td class="py-4 px-4"><span class="inline-flex px-2.5 py-1 rounded-full border text-xs font-semibold ' + verdictBadge(item.verdict) + '">' + escapeHTML(item.verdict) + '</span></td>' +
+          '<td class="py-4 px-4 text-sm text-slate-300">' + escapeHTML(item.created_by_name) + '</td>' +
+          '<td class="py-4 px-4 text-xs text-slate-400 mono">' + escapeHTML(formatDate(new Date(item.created_at))) + '</td>' +
+          '<td class="py-4 px-4"><button type="button" onclick="viewEvaluation(\'' + escapeHTML(item.id) + '\')" class="px-3 py-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 text-cyan-300 text-xs font-semibold">Ver ficha</button></td>' +
+          '</tr>';
+      }).join("");
+    }
+
+    async function loadRHEvaluations() {
+      const tbody = document.getElementById("rh-evaluations-table");
+      tbody.innerHTML = '<tr><td colspan="8" class="py-10 text-center text-slate-400">Consultando registros oficiais...</td></tr>';
+      try {
+        const data = await apiRequest("/api/evaluations");
+        cachedRHEvaluations = data.evaluations || [];
+        const records = cachedRHEvaluations;
+        document.getElementById("rh-count-total").textContent = records.length;
+        document.getElementById("rh-count-apt").textContent = records.filter(x => x.verdict === "APTO PARA EFETIVAÇÃO").length;
+        document.getElementById("rh-count-res").textContent = records.filter(x => x.verdict === "APTO COM RESSALVAS").length;
+        document.getElementById("rh-count-no").textContent = records.filter(x => x.verdict === "NÃO APTO PARA EFETIVAÇÃO").length;
+        renderRHEvaluations();
+      } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-10 text-center text-red-300">' + escapeHTML(error.message) + '</td></tr>';
+        showToast(error.message, "error");
+      }
+    }
+
+    window.viewEvaluation = async function(id) {
+      try {
+        const data = await apiRequest("/api/evaluations/" + encodeURIComponent(id));
+        const item = data.evaluation;
+        const names = [
+          ["Postura profissional", item.professional_posture],
+          ["Trabalho em equipe", item.teamwork],
+          ["Proatividade", item.proactivity],
+          ["Modulação prática", item.practical_modulation],
+          ["Conhecimento técnico", item.technical_knowledge]
+        ];
+        const audit = (data.history || []).map(entry =>
+          '<div class="p-3 rounded-xl bg-white/5 border border-white/10"><p class="text-sm font-semibold text-white">' +
+          escapeHTML(entry.action === "CREATED" ? "Avaliação registrada" : entry.action) +
+          '</p><p class="text-xs text-slate-400 mt-1">' + escapeHTML(entry.actor_name) + ' · ' +
+          escapeHTML(formatDate(new Date(entry.created_at))) + '</p></div>'
+        ).join("");
+        let modal = document.getElementById("evaluation-detail-modal");
+        if (!modal) {
+          modal = document.createElement("div");
+          modal.id = "evaluation-detail-modal";
+          modal.className = "fixed inset-0 z-[70] bg-black/75 backdrop-blur-sm p-4 flex items-center justify-center";
+          document.body.appendChild(modal);
+        }
+        modal.innerHTML = '<div class="glass-panel border border-cyan-500/20 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6">' +
+          '<div class="flex items-start justify-between gap-4 mb-6"><div><p class="text-xs text-cyan-400 mono uppercase tracking-wider">Ficha de avaliação</p><h2 class="text-2xl font-bold mt-1">' + escapeHTML(item.agp_name) + '</h2><p class="text-sm text-slate-400 mt-1">RG / matrícula: ' + escapeHTML(item.rg) + '</p></div><button onclick="closeEvaluationDetail()" class="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300">✕</button></div>' +
+          '<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6"><div class="rounded-xl bg-white/5 p-4"><p class="text-xs text-slate-400">Média final</p><p class="text-2xl font-bold mt-1">' + Number(item.average).toFixed(2).replace(".", ",") + '</p></div><div class="rounded-xl bg-white/5 p-4"><p class="text-xs text-slate-400">Certificação CPD</p><p class="text-lg font-bold mt-1">' + (Number(item.cpd_certified) === 1 ? "SIM" : "NÃO") + '</p></div><div class="rounded-xl bg-white/5 p-4"><p class="text-xs text-slate-400">Cursos</p><p class="text-sm font-semibold mt-2">' + escapeHTML(item.courses || "Não informado") + '</p></div></div>' +
+          '<div class="rounded-xl border border-white/10 overflow-hidden mb-6"><div class="px-4 py-3 bg-white/5 font-semibold">Notas por critério</div>' +
+          names.map(row => '<div class="flex justify-between gap-4 px-4 py-3 border-t border-white/5"><span class="text-sm text-slate-300">' + row[0] + '</span><strong class="text-cyan-300">' + row[1] + ' / 5</strong></div>').join("") + '</div>' +
+          '<div class="mb-6"><span class="inline-flex px-3 py-2 rounded-xl border text-sm font-bold ' + verdictBadge(item.verdict) + '">' + escapeHTML(item.verdict) + '</span></div>' +
+          '<div class="mb-6"><h3 class="font-semibold mb-2">Observações</h3><p class="text-sm text-slate-300 whitespace-pre-wrap rounded-xl bg-black/20 p-4">' + escapeHTML(item.observations || "Nenhuma observação registrada.") + '</p></div>' +
+          '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-sm"><div><p class="text-slate-500">Avaliado por</p><p class="text-slate-200 mt-1">' + escapeHTML(item.created_by_name) + '</p></div><div><p class="text-slate-500">Data do registro</p><p class="text-slate-200 mt-1">' + escapeHTML(formatDate(new Date(item.created_at))) + '</p></div></div>' +
+          '<div><h3 class="font-semibold mb-3">Histórico de auditoria</h3><div class="space-y-2">' + (audit || '<p class="text-xs text-slate-500">Sem eventos registrados.</p>') + '</div></div>' +
+          '<div class="flex justify-end mt-6"><button onclick="closeEvaluationDetail()" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white">Fechar ficha</button></div></div>';
+      } catch (error) {
+        showToast(error.message, "error");
+      }
+    };
+
+    window.closeEvaluationDetail = function() {
+      document.getElementById("evaluation-detail-modal")?.remove();
+    };
+
+    async function loadHRAccess() {
+      const list = document.getElementById("rh-access-list");
+      if (!list || !isCurrentUserAdmin) return;
+      list.innerHTML = '<p class="text-sm text-slate-400">Consultando permissões...</p>';
+      try {
+        const data = await apiRequest("/api/rh-access");
+        if (!data.users.length) {
+          list.innerHTML = '<p class="text-sm text-slate-500">Nenhum profissional do RH cadastrado além do administrador geral.</p>';
+          return;
+        }
+        list.innerHTML = data.users.map(user =>
+          '<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-black/20 border border-white/5"><div><p class="font-semibold text-sm">' + escapeHTML(user.display_name) + '</p><p class="text-xs text-slate-500 mono">' + escapeHTML(user.discord_id) + '</p><p class="text-xs text-slate-500 mt-1">Liberado por ' + escapeHTML(user.granted_by_name) + ' · ' + escapeHTML(formatDate(new Date(user.granted_at))) + '</p></div><button type="button" onclick="revokeHRAccess(\'' + escapeHTML(user.discord_id) + '\')" class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-300 text-xs font-semibold">Revogar acesso</button></div>'
+        ).join("");
+      } catch (error) {
+        list.innerHTML = '<p class="text-sm text-red-300">' + escapeHTML(error.message) + '</p>';
+      }
+    }
+
+    window.revokeHRAccess = async function(discordId) {
+      if (!confirm("Revogar o acesso ao painel do RH deste profissional?")) return;
+      try {
+        await apiRequest("/api/rh-access?id=" + encodeURIComponent(discordId), { method: "DELETE" });
+        showToast("Acesso ao RH revogado e registrado.", "success");
+        loadHRAccess();
+      } catch (error) {
+        showToast(error.message, "error");
+      }
+    };
 
     // ===================== UTILITÁRIOS =====================
     function showScreen(name) {
@@ -692,6 +1038,9 @@
     function logout() {
       accessToken = null;
       currentUser = null;
+      isCurrentUserAdmin = false;
+      isCurrentUserHR = false;
+      canEvaluate = false;
       history.pushState('', document.title, window.location.pathname + window.location.search);
       showScreen('login');
     }
@@ -835,6 +1184,7 @@
     }
 
     function renderAdmin() {
+      if (isCurrentUserAdmin) loadHRAccess();
       document.getElementById('admin-total-logins').textContent = loginHistory.length;
       document.getElementById('admin-total-members').textContent = membersList.length;
       document.getElementById('admin-active-materials').textContent = materialsList.length;
@@ -890,6 +1240,8 @@
     }
 
     function navigateTo(pageId) {
+      if (pageId === "avaliacao" && !canEvaluate) return showToast("Você não tem permissão para registrar avaliações.", "error");
+      if (pageId === "rh" && !isCurrentUserHR) return showToast("Acesso restrito ao Recursos Humanos.", "error");
       els.pages.forEach(p => p.classList.add('hidden'));
       document.getElementById('page-' + pageId).classList.remove('hidden');
 
@@ -897,6 +1249,7 @@
       document.querySelector(`[data-page="${pageId}"]`)?.classList.add('active');
 
       if (pageId === 'admin' && isCurrentUserAdmin) renderAdmin();
+      if (pageId === "rh" && isCurrentUserHR) loadRHEvaluations();
     }
 
     window.navigateTo = navigateTo;
@@ -1007,13 +1360,17 @@
       try {
         const user = await fetchDiscordUser();
         const member = await fetchGuildMember();
+        const portalSession = await apiRequest("/api/session");
 
         const isAdmin = user.id === ADMIN_USER_ID;
+        const isHRUser = portalSession.isHR === true;
         const hasAllowedRole = member && member.roles && ALLOWED_ROLE_IDS.some(roleId => member.roles.includes(roleId));
+        canEvaluate = portalSession.canEvaluate === true;
 
-        if (isAdmin || hasAllowedRole) {
+        if (isAdmin || hasAllowedRole || isHRUser) {
           currentUser = user;
           isCurrentUserAdmin = isAdmin;
+          isCurrentUserHR = isHRUser;
           const content = getUserContent(user.id);
 
           const avatarUrl = user.avatar
@@ -1035,6 +1392,8 @@
 
           const adminNav = document.querySelector('[data-page="admin"]');
           if (adminNav) adminNav.classList.toggle('hidden', !isAdmin);
+          document.getElementById("nav-avaliacao")?.classList.toggle("hidden", !canEvaluate);
+          document.getElementById("nav-rh")?.classList.toggle("hidden", !isCurrentUserHR);
 
           // Se for admin, sincroniza materiais
           if (isAdmin) {
@@ -1054,6 +1413,67 @@
         logout();
       }
     }
+
+    // ===================== EVENTOS: AVALIAÇÃO E RH =====================
+    document.querySelectorAll("[data-score]").forEach(select => {
+      select.addEventListener("change", calculateEvaluationPreview);
+    });
+
+    document.getElementById("probation-evaluation-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = event.currentTarget.querySelector('button[type="submit"]');
+      button.disabled = true;
+      button.textContent = "Registrando...";
+      const payload = {
+        agp_name: document.getElementById("eval-agp-name").value.trim(),
+        rg: document.getElementById("eval-rg").value.trim(),
+        courses: document.getElementById("eval-courses").value.trim(),
+        cpd_certified: document.getElementById("eval-cpd").value,
+        professional_posture: Number(document.getElementById("eval-posture").value),
+        teamwork: Number(document.getElementById("eval-teamwork").value),
+        proactivity: Number(document.getElementById("eval-proactivity").value),
+        practical_modulation: Number(document.getElementById("eval-modulation").value),
+        technical_knowledge: Number(document.getElementById("eval-technical").value),
+        observations: document.getElementById("eval-observations").value.trim()
+      };
+      try {
+        const result = await apiRequest("/api/evaluations", { method: "POST", body: payload });
+        event.currentTarget.reset();
+        calculateEvaluationPreview();
+        showToast("Avaliação registrada. O RH já pode consultar o parecer.", "success");
+        if (isCurrentUserHR) loadRHEvaluations();
+      } catch (error) {
+        showToast(error.message, "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Registrar avaliação oficial";
+      }
+    });
+
+    document.getElementById("rh-evaluation-search").addEventListener("input", renderRHEvaluations);
+    document.getElementById("rh-refresh-button").addEventListener("click", loadRHEvaluations);
+
+    document.getElementById("rh-access-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const submit = event.currentTarget.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      try {
+        await apiRequest("/api/rh-access", {
+          method: "POST",
+          body: {
+            display_name: document.getElementById("rh-access-name").value.trim(),
+            discord_id: document.getElementById("rh-access-id").value.trim()
+          }
+        });
+        event.currentTarget.reset();
+        showToast("Acesso ao RH liberado e registrado.", "success");
+        loadHRAccess();
+      } catch (error) {
+        showToast(error.message, "error");
+      } finally {
+        submit.disabled = false;
+      }
+    });
 
     // ===================== EVENTOS =====================
     els.btnLogin.addEventListener('click', () => {
