@@ -20,6 +20,9 @@ export async function onRequestPost({ request, env, params }) {
   let score=0, correct=0;
   questions.forEach((q,i)=>{ if(Number(answers[String(i+1)])===q.correct){score+=q.points;correct++;} });
   const now=new Date().toISOString(), id=crypto.randomUUID();
+  await env.DB.prepare(`INSERT INTO exam_profiles (discord_id,discord_name,full_name,rg,created_at,updated_at)
+    VALUES (?,?,?,?,?,?) ON CONFLICT(discord_id) DO UPDATE SET discord_name=excluded.discord_name,full_name=excluded.full_name,rg=excluded.rg,updated_at=excluded.updated_at`)
+    .bind(auth.session.user.id,auth.session.user.name,fullName,rg,now,now).run();
   if (previous && exam.allow_retry) {
     await env.DB.prepare("DELETE FROM exam_attempts WHERE id=?").bind(previous.id).run();
   }
