@@ -257,6 +257,10 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6m-6 4h6m-6 4h6m-6 4h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"></path></svg>
           Avaliação Probatória
         </button>
+        <button id="nav-provas" data-page="provas" class="nav-item hidden w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6m-6 4h6m-6 4h6m-6 4h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
+          Provas e Resultados
+        </button>
         <button id="nav-rh" data-page="rh" class="nav-item hidden w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87M12 12a4 4 0 100-8 4 4 0 000 8zm7 0a3 3 0 100-6"></path></svg>
           Painel do RH
@@ -550,6 +554,13 @@
         </div>
       </section>
 
+      <!-- PROVAS -->
+      <section id="page-provas" class="page hidden fade-in">
+        <header class="mb-8"><p class="text-cyan-400 text-sm font-semibold mono mb-1">AVALIAÇÕES</p><h1 class="text-3xl font-bold">Provas e Resultados</h1><p class="text-slate-400 mt-1">Gerencie os links públicos e acompanhe os resultados registrados pelo Discord.</p></header>
+        <div class="glass-panel rounded-2xl p-6 mb-6"><div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-xl font-bold">Prova de Integração SMI</h2><p class="text-sm text-slate-400 mt-1">15 questões · 16 pontos · uma tentativa por conta Discord</p></div><span id="exam-status" class="px-3 py-1 rounded-full text-xs border border-emerald-400/30 bg-emerald-400/10 text-emerald-300">ATIVA</span></div><div class="mt-4 flex flex-wrap gap-3"><input id="exam-public-link" readonly class="min-w-0 flex-1 rounded-xl bg-slate-950 border border-white/10 px-3 py-3 text-sm text-slate-300" value="https://smi-67d.pages.dev/?prova=prova-integracao-2026-01"><button onclick="copyExamLink()" class="px-4 py-3 rounded-xl bg-cyan-500 text-slate-950 font-bold text-sm">Copiar link público</button><button onclick="toggleExamStatus()" id="exam-toggle" class="px-4 py-3 rounded-xl bg-slate-700 text-white font-semibold text-sm">Desativar prova</button><button onclick="loadExamResults()" class="px-4 py-3 rounded-xl border border-white/10 text-sm">Atualizar resultados</button></div></div>
+        <div class="glass-panel rounded-2xl p-6"><div class="flex items-center justify-between mb-4"><h2 class="text-xl font-bold">Respostas recebidas</h2><span id="exam-result-count" class="text-xs text-slate-400">0 registros</span></div><div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="text-xs text-slate-400 border-b border-white/10"><th class="py-3 pr-4">Agente</th><th class="py-3 pr-4">RG/Matrícula</th><th class="py-3 pr-4">Discord</th><th class="py-3 pr-4">Nota</th><th class="py-3 pr-4">Acertos</th><th class="py-3">Envio</th></tr></thead><tbody id="exam-results-body"><tr><td colspan="6" class="py-8 text-center text-slate-500">Carregando resultados...</td></tr></tbody></table></div><div class="mt-4 flex justify-end"><button onclick="exportExamResults()" class="px-4 py-2 rounded-lg border border-cyan-400/30 text-cyan-300 text-sm">Exportar CSV</button></div></div>
+      </section>
+
       <!-- REGIMENTO -->
       <section id="page-regimento" class="page hidden fade-in">
         <header class="mb-8">
@@ -751,6 +762,8 @@
       </form>
     </div>
   </div>
+
+  <div id="public-exam-screen" class="hidden min-h-screen p-4 md:p-8 bg-slate-950 text-slate-100"><div class="max-w-4xl mx-auto"><div class="flex items-center gap-3 mb-8"><img src="https://cdn.discordapp.com/attachments/1329544134272356512/1450000000000000000/smi-logo.png" onerror="this.style.display='none'" class="w-12 h-12 object-contain" alt=""><div><p class="text-cyan-400 text-xs tracking-widest font-bold">SETOR DE MONITORIA DE INTEGRAÇÃO</p><h1 class="text-2xl font-black">Avaliação de Conhecimentos</h1></div></div><div id="public-exam-content" class="space-y-5"><div class="glass-panel rounded-2xl p-6 text-slate-300">Carregando prova...</div></div></div></div>
 
   <script>
     // ===================== CONFIGURAÇÕES =====================
@@ -1057,6 +1070,7 @@
       loading: document.getElementById('loading-screen'),
       unauthorized: document.getElementById('unauthorized-screen'),
       dashboard: document.getElementById('dashboard-app'),
+      exam: document.getElementById('public-exam-screen'),
     };
 
     const els = {
@@ -1078,6 +1092,9 @@
     let currentUser = null;
     let accessToken = null;
     let cachedRHEvaluations = [];
+    let currentExamSlug = null;
+    let currentExamActive = true;
+    let cachedExamResults = [];
 
     async function loadMaterialsFromApi() {
       const data = await apiRequest("/api/materials");
@@ -1365,6 +1382,7 @@
         token: params.get('access_token'),
         tokenType: params.get('token_type'),
         expiresIn: params.get('expires_in'),
+        state: params.get('state'),
       };
     }
 
@@ -1561,6 +1579,7 @@
     function navigateTo(pageId) {
       if (pageId === "avaliacao" && !canEvaluate) return showToast("Você não tem permissão para registrar avaliações.", "error");
       if (pageId === "rh" && !isCurrentUserHR) return showToast("Acesso restrito ao Recursos Humanos.", "error");
+      if (pageId === "provas" && !isCurrentUserAdmin) return showToast("Acesso restrito ao administrador.", "error");
       els.pages.forEach(p => p.classList.add('hidden'));
       document.getElementById('page-' + pageId).classList.remove('hidden');
 
@@ -1569,6 +1588,7 @@
 
       if (pageId === 'admin' && isCurrentUserAdmin) renderAdmin();
       if (pageId === "rh" && isCurrentUserHR) loadRHEvaluations();
+      if (pageId === "provas" && isCurrentUserAdmin) loadExamResults();
     }
 
     window.navigateTo = navigateTo;
@@ -1691,6 +1711,53 @@
       return res.json();
     }
 
+    // ===================== PROVAS PÚBLICAS SMI =====================
+    async function renderPublicExam(slug, user) {
+      const root = document.getElementById('public-exam-content');
+      root.innerHTML = '<div class="rounded-2xl border border-cyan-400/20 bg-slate-900 p-6">Validando acesso à prova...</div>';
+      try {
+        const data = await apiRequest('/api/exams/' + encodeURIComponent(slug));
+        const exam = data.exam;
+        root.innerHTML = `
+          <div class="rounded-2xl border border-cyan-400/20 bg-gradient-to-br from-slate-900 to-blue-950 p-6"><p class="text-xs text-cyan-300 font-bold tracking-widest">PROVA OFICIAL</p><h2 class="text-2xl font-black mt-2">${escapeHTML(exam.title)}</h2><p class="text-slate-300 mt-2">${escapeHTML(exam.description || '')}</p><div class="mt-4 text-sm text-slate-400">${exam.questions.length} questões · ${exam.total_points} pontos · Identidade Discord: <b class="text-white">${escapeHTML(user.global_name || user.username)}</b></div></div>
+          <form id="public-exam-form" class="space-y-5">
+            <div class="rounded-2xl border border-white/10 bg-slate-900 p-5 grid md:grid-cols-2 gap-4"><label class="text-sm text-slate-300">Nome completo<input name="full_name" required minlength="3" maxlength="140" autocomplete="name" class="mt-2 w-full rounded-xl bg-slate-950 border border-white/10 px-3 py-3 text-white" placeholder="Digite seu nome completo"></label><label class="text-sm text-slate-300">RG / Matrícula<input name="rg" required minlength="3" maxlength="40" class="mt-2 w-full rounded-xl bg-slate-950 border border-white/10 px-3 py-3 text-white" placeholder="Digite seu RG ou matrícula"></label></div>
+            ${exam.questions.map((q,i)=>`<fieldset class="rounded-2xl border border-white/10 bg-slate-900 p-5"><legend class="font-bold text-white px-2">Questão ${i+1} <span class="text-xs text-cyan-300 font-normal">(${q.points} ponto${q.points>1?'s':''})</span></legend><p class="text-slate-200 leading-relaxed mt-2">${escapeHTML(q.text)}</p><div class="mt-4 space-y-2">${q.options.map((o,j)=>`<label class="flex items-start gap-3 p-3 rounded-xl border border-white/5 hover:border-cyan-400/30 bg-slate-950/60 cursor-pointer"><input type="radio" required name="q${i+1}" value="${j}" class="mt-1 accent-cyan-400"><span class="text-sm text-slate-300">${escapeHTML(o)}</span></label>`).join('')}</div></fieldset>`).join('')}
+            <button id="submit-public-exam" type="submit" class="w-full rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black py-4">FINALIZAR E ENVIAR RESPOSTAS</button><p class="text-center text-xs text-slate-500">Confira suas respostas antes de enviar. Cada conta Discord poderá realizar uma tentativa.</p>
+          </form>`;
+        document.getElementById('public-exam-form').addEventListener('submit', async event => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const fd = new FormData(form);
+          const answers = {};
+          exam.questions.forEach((q,i)=>{ const value=fd.get('q'+(i+1)); if(value===null) throw new Error('Responda todas as questões.'); answers[String(i+1)]=Number(value); });
+          const button=document.getElementById('submit-public-exam'); button.disabled=true; button.textContent='ENVIANDO...';
+          try {
+            const result=await apiRequest('/api/exams/'+encodeURIComponent(slug)+'/submit',{method:'POST',body:{full_name:fd.get('full_name'),rg:fd.get('rg'),answers}});
+            root.innerHTML=`<div class="rounded-3xl border border-emerald-400/30 bg-slate-900 p-8 text-center"><div class="text-emerald-300 text-sm font-bold tracking-widest">RESPOSTAS REGISTRADAS</div><h2 class="text-3xl font-black mt-3">Prova concluída!</h2><p class="text-slate-400 mt-2">${escapeHTML(fd.get('full_name'))}, seu resultado foi registrado.</p><div class="text-5xl font-black text-cyan-300 mt-8">${result.result.score} / ${result.result.total_points}</div><p class="text-slate-400 mt-2">${result.result.correct_count} de ${result.result.question_count} questões corretas</p><p class="text-xs text-slate-500 mt-6">O SMI registrou seu envio vinculado à sua conta Discord.</p></div>`;
+          } catch(error) { button.disabled=false; button.textContent='TENTAR ENVIAR NOVAMENTE'; showToast(error.message,'error'); }
+        });
+      } catch(error) {
+        root.innerHTML=`<div class="rounded-2xl border border-amber-400/30 bg-slate-900 p-7"><h2 class="text-xl font-bold text-amber-300">Não foi possível abrir a prova</h2><p class="text-slate-300 mt-2">${escapeHTML(error.message)}</p><p class="text-xs text-slate-500 mt-4">Se você já enviou suas respostas, uma nova tentativa não será permitida.</p></div>`;
+      }
+    }
+
+    async function loadExamResults() {
+      if (!isCurrentUserAdmin) return;
+      try {
+        const [data, exams] = await Promise.all([apiRequest('/api/exams/results'),apiRequest('/api/exams')]);
+        cachedExamResults=data.results||[];
+        const exam=exams.exams?.find(e=>e.slug==='prova-integracao-2026-01');
+        if(exam){currentExamActive=!!exam.active;document.getElementById('exam-status').textContent=exam.active?'ATIVA':'DESATIVADA';document.getElementById('exam-status').className='px-3 py-1 rounded-full text-xs border '+(exam.active?'border-emerald-400/30 bg-emerald-400/10 text-emerald-300':'border-red-400/30 bg-red-400/10 text-red-300');document.getElementById('exam-toggle').textContent=exam.active?'Desativar prova':'Ativar prova';}
+        document.getElementById('exam-result-count').textContent=cachedExamResults.length+' registros';
+        document.getElementById('exam-results-body').innerHTML=cachedExamResults.length?cachedExamResults.map(r=>`<tr class="border-b border-white/5 text-sm"><td class="py-3 pr-4 font-semibold">${escapeHTML(r.full_name)}</td><td class="py-3 pr-4 mono text-slate-400">${escapeHTML(r.rg)}</td><td class="py-3 pr-4 text-slate-400">${escapeHTML(r.discord_name)}</td><td class="py-3 pr-4 font-bold text-cyan-300">${r.score}/${r.total_points}</td><td class="py-3 pr-4">${r.correct_count}/${r.question_count}</td><td class="py-3 text-slate-400">${new Date(r.submitted_at).toLocaleString('pt-BR')}</td></tr>`).join(''):'<tr><td colspan="6" class="py-8 text-center text-slate-500">Nenhuma resposta recebida ainda.</td></tr>';
+      } catch(error){showToast(error.message,'error');}
+    }
+    window.loadExamResults=loadExamResults;
+    window.copyExamLink=async function(){const input=document.getElementById('exam-public-link');try{await navigator.clipboard.writeText(input.value);showToast('Link público copiado.','success');}catch{input.select();document.execCommand('copy');showToast('Link copiado.','success');}};
+    window.toggleExamStatus=async function(){try{const response=await apiRequest('/api/exams/prova-integracao-2026-01',{method:'PATCH',body:{active:!currentExamActive}});currentExamActive=!!response.exam.active;await loadExamResults();showToast(currentExamActive?'Prova ativada.':'Prova desativada.','success');}catch(error){showToast(error.message,'error');}};
+    window.exportExamResults=function(){const rows=[['Agente','RG/Matrícula','Discord ID','Discord','Nota','Total','Acertos','Questões','Enviado'],...cachedExamResults.map(r=>[r.full_name,r.rg,r.discord_id,r.discord_name,r.score,r.total_points,r.correct_count,r.question_count,r.submitted_at])];const csv='\\ufeff'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='resultados-prova-smi.csv';a.click();URL.revokeObjectURL(url);};
+
     // ===================== FLUXO PRINCIPAL =====================
     async function handleAuth() {
       const hash = parseHashParams();
@@ -1701,9 +1768,17 @@
 
       try {
         const user = await fetchDiscordUser();
-        const member = await fetchGuildMember();
         const portalSession = await apiRequest("/api/session");
-
+        const examState = hash.state && hash.state.startsWith('exam:') ? hash.state.slice(5) : null;
+        if (examState) {
+          currentUser = user;
+          currentExamSlug = examState;
+          await renderPublicExam(examState, user);
+          history.replaceState({}, document.title, window.location.origin + '/?prova=' + encodeURIComponent(examState));
+          showScreen('exam');
+          return;
+        }
+        const member = await fetchGuildMember();
         const isAdmin = user.id === ADMIN_USER_ID;
         const isHRUser = portalSession.isHR === true;
         const hasAllowedRole = member && member.roles && ALLOWED_ROLE_IDS.some(roleId => member.roles.includes(roleId));
@@ -1738,6 +1813,7 @@
           if (adminNav) adminNav.classList.toggle('hidden', !isAdmin);
           document.getElementById("nav-avaliacao")?.classList.toggle("hidden", !canEvaluate);
           document.getElementById("nav-rh")?.classList.toggle("hidden", !isCurrentUserHR);
+          document.getElementById("nav-provas")?.classList.toggle("hidden", !isCurrentUserAdmin);
 
           // Os materiais são carregados do banco D1 para todos os usuários autorizados.
           renderDashboard(content);
@@ -1819,7 +1895,9 @@
 
     // ===================== EVENTOS =====================
     els.btnLogin.addEventListener('click', () => {
-      window.location.href = DISCORD_AUTH_URL;
+      const exam = new URLSearchParams(window.location.search).get('prova');
+      const state = exam ? 'exam:' + exam : 'portal';
+      window.location.href = DISCORD_AUTH_URL + '&state=' + encodeURIComponent(state);
     });
 
     els.btnLogout.addEventListener('click', logout);
