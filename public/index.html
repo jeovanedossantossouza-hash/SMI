@@ -1079,6 +1079,11 @@
     let accessToken = null;
     let cachedRHEvaluations = [];
 
+    async function loadMaterialsFromApi() {
+      const data = await apiRequest("/api/materials");
+      return Array.isArray(data.materials) ? data.materials : [];
+    }
+
     // ===================== API DO PORTAL / AVALIAÇÕES =====================
     async function apiRequest(path, options = {}) {
       if (!accessToken) throw new Error("Sua sessão expirou. Entre novamente pelo Discord.");
@@ -1473,18 +1478,22 @@
         </div>
       `).join('');
 
-      document.getElementById('materials-grid').innerHTML = content.materials.map(mat => `
-        <a href="${mat.link || '#'}" target="_blank" class="file-card glass-panel rounded-2xl p-6 border border-white/10 cursor-pointer block hover:no-underline">
-          <div class="flex items-start justify-between mb-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-sm">
-              ${mat.type}
+      content.materials = materialsList;
+      document.getElementById('metric-materiais').textContent = materialsList.length;
+      document.getElementById('materials-grid').innerHTML = materialsList.length
+        ? materialsList.map(mat => `
+          <a href="${escapeHTML(mat.link || '#')}" target="_blank" rel="noopener noreferrer" class="file-card glass-panel rounded-2xl p-6 border border-white/10 cursor-pointer block hover:no-underline">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-sm">
+                ${escapeHTML(mat.type)}
+              </div>
+              <span class="text-xs px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">${escapeHTML(mat.tag)}</span>
             </div>
-            <span class="text-xs px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">${mat.tag}</span>
-          </div>
-          <h3 class="font-bold text-lg mb-1 text-white">${mat.title}</h3>
-          <p class="text-sm text-slate-400 mono">${mat.size}</p>
-        </a>
-      `).join('');
+            <h3 class="font-bold text-lg mb-1 text-white">${escapeHTML(mat.title)}</h3>
+            <p class="text-sm text-slate-400 mono">${escapeHTML(mat.size)}</p>
+          </a>
+        `).join('')
+        : '<div class="md:col-span-2 lg:col-span-3 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center"><p class="font-semibold text-slate-300">Nenhum material publicado no momento.</p><p class="mt-1 text-sm text-slate-500">Os novos materiais disponibilizados pela administração aparecerão aqui.</p></div>';
 
       document.getElementById('regimento-content').innerHTML = content.regimento;
 
@@ -1534,17 +1543,19 @@
         </div>
       `).join('');
 
-      document.getElementById('admin-materials-table').innerHTML = materialsList.map((mat, idx) => `
-        <tr class="border-b border-white/5 table-row-hover transition">
-          <td class="py-3 px-4 text-sm text-slate-300">${mat.title}</td>
-          <td class="py-3 px-4 text-sm text-slate-400 mono">${mat.type}</td>
-          <td class="py-3 px-4 text-sm text-slate-400">${mat.tag}</td>
-          <td class="py-3 px-4 text-sm text-slate-500 mono">${mat.size}</td>
-          <td class="py-3 px-4">
-            <button onclick="removeMaterial(${idx})" class="text-xs px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 transition">Remover</button>
-          </td>
-        </tr>
-      `).join('');
+      document.getElementById('admin-materials-table').innerHTML = materialsList.length
+        ? materialsList.map(mat => `
+          <tr class="border-b border-white/5 table-row-hover transition">
+            <td class="py-3 px-4 text-sm text-slate-300">${escapeHTML(mat.title)}</td>
+            <td class="py-3 px-4 text-sm text-slate-400 mono">${escapeHTML(mat.type)}</td>
+            <td class="py-3 px-4 text-sm text-slate-400">${escapeHTML(mat.tag)}</td>
+            <td class="py-3 px-4 text-sm text-slate-500 mono">${escapeHTML(mat.size)}</td>
+            <td class="py-3 px-4">
+              <button onclick="removeMaterial('${escapeHTML(mat.id)}')" class="text-xs px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 transition">Remover</button>
+            </td>
+          </tr>
+        `).join('')
+        : '<tr><td colspan="5" class="py-8 text-center text-slate-500">Nenhum material publicado.</td></tr>';
     }
 
     function navigateTo(pageId) {
@@ -1585,13 +1596,21 @@
       showToast(`${name} removido da lista`, 'warning');
     };
 
-    window.removeMaterial = function(idx) {
-      const title = materialsList[idx].title;
-      materialsList.splice(idx, 1);
-      const content = getUserContent(currentUser?.id);
-      content.materials = materialsList;
-      renderDashboard(content);
-      showToast(`${title} removido`, 'warning');
+    window.removeMaterial = async function(id) {
+      if (!isCurrentUserAdmin) return showToast("Somente o administrador pode remover materiais.", "error");
+      const material = materialsList.find(item => item.id === id);
+      if (!material) return showToast("Material não encontrado. Atualize a página e tente novamente.", "warning");
+      if (!confirm(`Remover "${material.title}" da área Meus Materiais?`)) return;
+      try {
+        await apiRequest("/api/materials/" + encodeURIComponent(id), { method: "DELETE" });
+        materialsList = await loadMaterialsFromApi();
+        const content = getUserContent(currentUser?.id);
+        content.materials = materialsList;
+        renderDashboard(content);
+        showToast("Material removido. O registro administrativo foi preservado.", "success");
+      } catch (error) {
+        showToast(error.message, "error");
+      }
     };
 
     window.exportLogins = function() {
@@ -1622,21 +1641,36 @@
       showToast(`${name} adicionado com sucesso`, 'success');
     });
 
-    document.getElementById('material-form').addEventListener('submit', (e) => {
+    document.getElementById('material-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!isCurrentUserAdmin) return showToast("Somente o administrador pode publicar materiais.", "error");
+      const form = e.currentTarget;
+      const button = form.querySelector('button[type="submit"]');
       const title = document.getElementById('mat-title').value.trim();
       const type = document.getElementById('mat-type').value;
       const tag = document.getElementById('mat-category').value;
       const size = document.getElementById('mat-size').value.trim();
       const link = document.getElementById('mat-link').value.trim();
       if (!title || !size || !link) return;
-      const newMat = { title, type, size, tag, link };
-      materialsList.unshift(newMat);
-      const content = getUserContent(currentUser?.id);
-      content.materials = materialsList;
-      renderDashboard(content);
-      e.target.reset();
-      showToast('Material publicado com sucesso', 'success');
+      button.disabled = true;
+      button.textContent = "Salvando...";
+      try {
+        await apiRequest("/api/materials", {
+          method: "POST",
+          body: { title, type, tag, size, link }
+        });
+        materialsList = await loadMaterialsFromApi();
+        const content = getUserContent(currentUser?.id);
+        content.materials = materialsList;
+        renderDashboard(content);
+        form.reset();
+        showToast("Material publicado e salvo permanentemente.", "success");
+      } catch (error) {
+        showToast(error.message, "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Salvar Material";
+      }
     });
 
     // ===================== API DISCORD =====================
@@ -1680,6 +1714,8 @@
           isCurrentUserAdmin = isAdmin;
           isCurrentUserHR = isHRUser;
           const content = getUserContent(user.id);
+          materialsList = await loadMaterialsFromApi();
+          content.materials = materialsList;
 
           const avatarUrl = user.avatar
             ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
@@ -1703,11 +1739,7 @@
           document.getElementById("nav-avaliacao")?.classList.toggle("hidden", !canEvaluate);
           document.getElementById("nav-rh")?.classList.toggle("hidden", !isCurrentUserHR);
 
-          // Se for admin, sincroniza materiais
-          if (isAdmin) {
-            materialsList = [...content.materials];
-          }
-
+          // Os materiais são carregados do banco D1 para todos os usuários autorizados.
           renderDashboard(content);
           showScreen('dashboard');
           showToast(isAdmin ? 'Bem-vindo, Administrador' : 'Acesso autorizado', 'success');
