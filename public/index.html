@@ -971,7 +971,7 @@
         ];
         const audit = (data.history || []).map(entry =>
           '<div class="p-3 rounded-xl bg-white/5 border border-white/10"><p class="text-sm font-semibold text-white">' +
-          escapeHTML(entry.action === "CREATED" ? "Avaliação registrada" : entry.action) +
+          escapeHTML(({ CREATED: "Avaliação registrada", UPDATED: "Avaliação retificada", ARCHIVED: "Avaliação arquivada", ARCHIVED_BULK: "Avaliação arquivada em lote" }[entry.action] || entry.action)) +
           '</p><p class="text-xs text-slate-400 mt-1">' + escapeHTML(entry.actor_name) + ' · ' +
           escapeHTML(formatDate(new Date(entry.created_at))) + '</p></div>'
         ).join("");
