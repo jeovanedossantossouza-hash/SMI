@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Operacional | SMI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary: #00f0ff;
+      --secondary: #7c3aed;
+      --accent: #f472b6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0a0a0f;
+      --panel: rgba(15, 23, 42, 0.75);
+    }
+
+    * { font-family: 'Inter', sans-serif; }
+
+    body {
+      background: var(--dark);
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(0, 240, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(244, 114, 182, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0a0f 0%, #111827 100%);
+    }
+
+    .grid-lines {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(circle at center, black 0%, transparent 80%);
+    }
+
+    .glass-panel {
+      background: var(--panel);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .neon-border {
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.1), inset 0 0 20px rgba(0, 240, 255, 0.05);
+    }
+
+    .neon-text {
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+    }
+
+    .glow-btn {
+      position: relative;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(124, 58, 237, 0.15));
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .glow-btn:hover {
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .nav-item {
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: rgba(0, 240, 255, 0.08);
+      border-left-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .metric-card {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 240, 255, 0.3);
+      box-shadow: 0 10px 40px rgba(0, 240, 255, 0.1);
+    }
+
+    .typing-effect::after {
+      content: '|';
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .file-card {
+      transition: all 0.2s ease;
+    }
+
+    .file-card:hover {
+      background: rgba(0, 240, 255, 0.05);
+      border-color: rgba(0, 240, 255, 0.3);
+    }
+
+    .smi-logo-pulse {
+      animation: smiPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes smiPulse {
+      0%, 100% {
+        filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.4)) brightness(1);
+        transform: scale(1);
+      }
+      50% {
+        filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.8)) drop-shadow(0 0 40px rgba(0, 140, 255, 0.5)) brightness(1.15);
+        transform: scale(1.03);
+      }
+    }
+
+    .scroll-thin::-webkit-scrollbar { width: 6px; }
+    .scroll-thin::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+    .scroll-thin::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.3); border-radius: 3px; }
+
+    .hidden { display: none !important; }
+
+    .fade-in { animation: fadeIn 0.5s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .table-row-hover:hover { background: rgba(255,255,255,0.04); }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="bg-mesh"></div>
+  <div class="grid-lines"></div>
+
+  <!-- LOGIN -->
+  <main id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="glass-panel neon-border w-full max-w-lg rounded-3xl p-10 text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
+
+      <div class="relative mb-8">
+        <div class="w-28 h-28 mx-auto rounded-2xl bg-gradient-to-br from-cyan-500/20 to-purple-600/20 flex items-center justify-center border border-cyan-500/30 p-3 shadow-[0_0_30px_rgba(0,240,255,0.15)]">
+          <img src="https://d31zra5bs5df64.cloudfront.net/prod/3Etsy4a3jGOYznut1NU3fVHon3B/chat/3MPtKavfNNVcikLStKAp513ujzi/3MPxTvgNemTLend00BJndQsgdDx.png?Expires=1795269614&Key-Pair-Id=K2FT0I8VPJSP5H&Signature=G1v~4rHlTzFq7lKFR95BMRKClsqfAapN4qKIYXxQ8-G-9gHDCoFUkxWqpwoLRgztjtnj~~8EMo7le6yyZW~NPQJpMkwpSFhwHXApSWLO7XUbGxp0zxSoI5tPju1aVsEmQcgHO12yVzdq2wOb6wVfueuAvnUT5glCyRbts4CwUvPGQ28LbmNUPsgFvhyIAFNsQSkQj6M5HIM77FjpH8jlAQqVwM9882pCVRCJUEDUlRup2RKCzsUms60cL1Do4I5YlVAu2uRKfur8W2l6KE6VSiiSPgdtjmjmdQgAalrY44TUi1-fn8GH5zI8NjeqAOEp72Zn4iWu-CcMrS8EPqhiQA__" alt="Brasão SMI" class="w-full h-full object-contain smi-logo-pulse drop-shadow-[0_0_12px_rgba(0,240,255,0.4)]">
+        </div>
+      </div>
+
+      <h1 class="text-4xl font-extrabold mb-3 neon-text tracking-tight">PORTAL OPERACIONAL</h1>
+      <p class="text-slate-400 mb-8 text-lg">Ambiente corporativo de integração e gestão SMI</p>
+
+      <div id="setup-alert" class="mb-6 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-200 text-sm text-left">
+        <p class="font-semibold mb-2">⚙️ Configure antes de publicar:</p>
+        <ul class="list-disc list-inside space-y-1 text-yellow-100/70">
+          <li><code class="mono text-yellow-300">CLIENT_ID</code> do app Discord</li>
+          <li><code class="mono text-yellow-300">REDIRECT_URI</code> autorizado</li>
+        </ul>
+      </div>
+
+      <button id="btn-login" class="glow-btn w-full py-4 rounded-xl text-lg font-bold flex items-center justify-center gap-3">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        Entrar com Discord
+      </button>
+
+      <div class="mt-8 flex flex-col items-center">
+        <p class="text-[10px] text-slate-600 uppercase tracking-widest">Setor de Monitoramento e Integração</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- LOADING -->
+  <main id="loading-screen" class="hidden min-h-screen flex flex-col items-center justify-center">
+    <div class="relative w-24 h-24 mb-6">
+      <div class="absolute inset-0 rounded-full border-4 border-cyan-500/20"></div>
+      <div class="absolute inset-0 rounded-full border-4 border-t-cyan-400 border-r-transparent border-b-purple-500 border-l-transparent animate-spin"></div>
+      <div class="absolute inset-4 rounded-full bg-cyan-500/10 flex items-center justify-center">
+        <span class="mono text-cyan-400 text-xs">AUTH</span>
+      </div>
+    </div>
+    <h2 class="text-2xl font-bold mb-2">Verificando credenciais</h2>
+    <p class="text-slate-400 mono typing-effect">Consultando permissões no servidor</p>
+  </main>
+
+  <!-- UNAUTHORIZED -->
+  <main id="unauthorized-screen" class="hidden min-h-screen flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-3xl p-10 text-center border-red-500/30">
+      <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/30">
+        <svg class="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+        </svg>
+      </div>
+      <h2 class="text-3xl font-bold text-red-400 mb-3">Acesso Negado</h2>
+      <p class="text-slate-300 mb-2">Seu usuário não possui o cargo de acesso necessário neste servidor.</p>
+      <p class="text-slate-500 text-sm mb-6 mono">Servidor: <span id="unauth-guild-id"></span></p>
+      <button id="btn-logout-denied" class="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition font-semibold">
+        Sair e tentar outra conta
+      </button>
+    </div>
+  </main>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard-app" class="hidden min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="w-72 glass-panel border-r border-white/10 flex flex-col">
+      <div class="p-6 border-b border-white/10">
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-600/20 flex items-center justify-center p-1.5 border border-cyan-500/30 shadow-[0_0_15px_rgba(0,240,255,0.15)]">
+            <img src="https://d31zra5bs5df64.cloudfront.net/prod/3Etsy4a3jGOYznut1NU3fVHon3B/chat/3MPtKavfNNVcikLStKAp513ujzi/3MPxTvgNemTLend00BJndQsgdDx.png?Expires=1795269614&Key-Pair-Id=K2FT0I8VPJSP5H&Signature=G1v~4rHlTzFq7lKFR95BMRKClsqfAapN4qKIYXxQ8-G-9gHDCoFUkxWqpwoLRgztjtnj~~8EMo7le6yyZW~NPQJpMkwpSFhwHXApSWLO7XUbGxp0zxSoI5tPju1aVsEmQcgHO12yVzdq2wOb6wVfueuAvnUT5glCyRbts4CwUvPGQ28LbmNUPsgFvhyIAFNsQSkQj6M5HIM77FjpH8jlAQqVwM9882pCVRCJUEDUlRup2RKCzsUms60cL1Do4I5YlVAu2uRKfur8W2l6KE6VSiiSPgdtjmjmdQgAalrY44TUi1-fn8GH5zI8NjeqAOEp72Zn4iWu-CcMrS8EPqhiQA__" alt="Brasão SMI" class="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">
+          </div>
+          <div>
+            <h2 class="font-bold text-lg leading-tight">Portal</h2>
+            <p class="text-xs text-slate-400">Operacional</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="flex-1 p-4 space-y-1 overflow-y-auto scroll-thin">
+        <button data-page="home" class="nav-item active w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Início
+        </button>
+        <button data-page="monitor" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          Monitor de Integração
+        </button>
+        <button data-page="materiais" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          Meus Materiais
+        </button>
+        <button data-page="regimento" class="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Regimento SMI
+        </button>
+        <button data-page="admin" class="nav-item hidden w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-slate-300 border-t border-white/10 mt-2 pt-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Administração
+        </button>
+      </nav>
+
+      <div class="p-4 border-t border-white/10">
+        <div class="flex items-center gap-3 mb-3">
+          <img id="user-avatar" src="" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-cyan-500/50">
+          <div class="overflow-hidden">
+            <p id="user-name" class="font-semibold text-sm truncate"></p>
+            <p id="user-role" class="text-xs text-slate-400 truncate mono"></p>
+          </div>
+        </div>
+        <button id="btn-logout" class="w-full py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-medium transition border border-red-500/20">
+          Sair
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 overflow-y-auto scroll-thin">
+      <!-- HOME -->
+      <section id="page-home" class="page fade-in">
+        <header class="mb-8">
+          <p class="text-cyan-400 text-sm font-semibold mono mb-1">DASHBOARD</p>
+          <h1 class="text-3xl font-bold">Bem-vindo, <span id="welcome-name" class="neon-text"></span></h1>
+          <p class="text-slate-400 mt-1">Aqui está o resumo do seu ambiente operacional.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="metric-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm">Status Geral</span>
+              <span class="status-dot bg-emerald-400"></span>
+            </div>
+            <p class="text-3xl font-bold text-emerald-400">Operacional</p>
+            <p class="text-xs text-slate-500 mt-1 mono">Última atualização: agora</p>
+          </div>
+          <div class="metric-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm">Integrações Ativas</span>
+              <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <p class="text-3xl font-bold text-white" id="metric-integracoes">0</p>
+            <p class="text-xs text-slate-500 mt-1">Sistemas conectados</p>
+          </div>
+          <div class="metric-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm">Materiais Disponíveis</span>
+              <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            </div>
+            <p class="text-3xl font-bold text-white" id="metric-materiais">0</p>
+            <p class="text-xs text-slate-500 mt-1">Documentos e recursos</p>
+          </div>
+          <div class="metric-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm">Alertas</span>
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            </div>
+            <p class="text-3xl font-bold text-amber-400" id="metric-alertas">0</p>
+            <p class="text-xs text-slate-500 mt-1">Pendências de atenção</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="glass-panel rounded-2xl p-6">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              Acesso Rápido
+            </h3>
+            <div class="space-y-3" id="quick-access"></div>
+          </div>
+          <div class="glass-panel rounded-2xl p-6">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+              Anúncios e Avisos
+            </h3>
+            <div class="space-y-4" id="announcements"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MONITOR -->
+      <section id="page-monitor" class="page hidden fade-in">
+        <header class="mb-8">
+          <p class="text-cyan-400 text-sm font-semibold mono mb-1">MONITORAMENTO</p>
+          <h1 class="text-3xl font-bold">Monitor de Integração Operacional</h1>
+          <p class="text-slate-400 mt-1">Visão em tempo real dos sistemas e processos integrados.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div class="glass-panel rounded-2xl p-6 lg:col-span-2">
+            <h3 class="text-lg font-bold mb-4">Integrações por Sistema</h3>
+            <div class="space-y-4" id="integrations-list"></div>
+          </div>
+          <div class="space-y-6">
+            <div class="glass-panel rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-4">Health Score</h3>
+              <div class="relative w-40 h-40 mx-auto">
+                <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"></circle>
+                  <circle id="health-circle" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="0" stroke-linecap="round"></circle>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span class="text-3xl font-bold" id="health-score">98%</span>
+                  <span class="text-xs text-slate-400">saudável</span>
+                </div>
+              </div>
+            </div>
+            <div class="glass-panel rounded-2xl p-6">
+              <h3 class="text-lg font-bold mb-4">Atividade Recente</h3>
+              <div class="space-y-3 text-sm" id="activity-log"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MATERIAIS -->
+      <section id="page-materiais" class="page hidden fade-in">
+        <header class="mb-8">
+          <p class="text-purple-400 text-sm font-semibold mono mb-1">RECURSOS</p>
+          <h1 class="text-3xl font-bold">Meus Materiais</h1>
+          <p class="text-slate-400 mt-1">Documentos, guias e recursos disponíveis para você.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="materials-grid"></div>
+      </section>
+
+      <!-- REGIMENTO -->
+      <section id="page-regimento" class="page hidden fade-in">
+        <header class="mb-8">
+          <p class="text-pink-400 text-sm font-semibold mono mb-1">NORMATIVO</p>
+          <h1 class="text-3xl font-bold">Regimento SMI</h1>
+          <p class="text-slate-400 mt-1">Regulamento e diretrizes do Sistema de Monitoramento e Integração.</p>
+        </header>
+
+        <div class="glass-panel rounded-2xl p-8 max-w-4xl">
+          <div class="prose prose-invert max-w-none">
+            <div id="regimento-content" class="space-y-6 text-slate-300 leading-relaxed"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="page-admin" class="page hidden fade-in">
+        <header class="mb-8">
+          <p class="text-rose-400 text-sm font-semibold mono mb-1">ADMINISTRAÇÃO</p>
+          <h1 class="text-3xl font-bold">Painel do Administrador</h1>
+          <p class="text-slate-400 mt-1">Gerenciamento de acessos, membros e recursos do portal.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="metric-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm">Total de Logins</span>
+              <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+            </div>
+            <p class="text-3xl font-bold text-white" id="admin-total-logins">0</p>
+            <p class="text-xs text-slate-500 mt-1">Nesta sessão</p>
+          </div>
+          <div class="metric-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm">Membros Cadastrados</span>
+              <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+            <p class="text-3xl font-bold text-white" id="admin-total-members">0</p>
+            <p class="text-xs text-slate-500 mt-1">Membros gerenciáveis</p>
+          </div>
+          <div class="metric-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm">Materiais Ativos</span>
+              <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <p class="text-3xl font-bold text-white" id="admin-active-materials">0</p>
+            <p class="text-xs text-slate-500 mt-1">Publicados</p>
+          </div>
+          <div class="metric-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm">Alertas de Sistema</span>
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <p class="text-3xl font-bold text-amber-400" id="admin-system-alerts">0</p>
+            <p class="text-xs text-slate-500 mt-1">Requerem atenção</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div class="glass-panel rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold">Logins Recentes</h3>
+              <button onclick="exportLogins()" class="text-xs px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/20 transition">
+                Exportar CSV
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
+                    <th class="py-3 px-4">Usuário</th>
+                    <th class="py-3 px-4">Cargo</th>
+                    <th class="py-3 px-4">Horário</th>
+                    <th class="py-3 px-4">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-login-table"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold">Gerenciar Membros</h3>
+              <button onclick="openMemberModal()" class="text-xs px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 transition">
+                + Novo Membro
+              </button>
+            </div>
+            <div class="space-y-3 max-h-80 overflow-y-auto scroll-thin pr-2" id="admin-members-list"></div>
+          </div>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-6 mb-8">
+          <h3 class="text-lg font-bold mb-4">Adicionar Novo Material</h3>
+          <form id="material-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-sm text-slate-400 mb-1">Título do material</label>
+              <input type="text" id="mat-title" required placeholder="Ex: Manual de Procedimentos" class="w-full px-4 py-2.5 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Tipo</label>
+              <select id="mat-type" class="w-full px-4 py-2.5 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-none focus:border-cyan-500/50 transition">
+                <option>PDF</option>
+                <option>DOCX</option>
+                <option>XLSX</option>
+                <option>Vídeo</option>
+                <option>Imagem</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Categoria</label>
+              <select id="mat-category" class="w-full px-4 py-2.5 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-none focus:border-cyan-500/50 transition">
+                <option>Normativo</option>
+                <option>Rotina</option>
+                <option>Processo</option>
+                <option>Comunicação</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Tamanho (ex: 2.4 MB)</label>
+              <input type="text" id="mat-size" required placeholder="2.4 MB" class="w-full px-4 py-2.5 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition">
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Link do arquivo</label>
+              <input type="url" id="mat-link" required placeholder="https://..." class="w-full px-4 py-2.5 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition">
+            </div>
+            <div class="md:col-span-2 flex justify-end">
+              <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 text-white font-medium border border-cyan-500/30 transition">
+                Salvar Material
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-6">
+          <h3 class="text-lg font-bold mb-4">Materiais Publicados</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
+                  <th class="py-3 px-4">Título</th>
+                  <th class="py-3 px-4">Tipo</th>
+                  <th class="py-3 px-4">Categoria</th>
+                  <th class="py-3 px-4">Tamanho</th>
+                  <th class="py-3 px-4">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="admin-materials-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL NOVO MEMBRO -->
+  <div id="member-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="glass-panel rounded-2xl p-6 w-full max-w-md border border-cyan-500/30">
+      <h3 class="text-xl font-bold mb-4">Adicionar Novo Membro</h3>
+      <p class="text-sm text-slate-400 mb-4">No modo estático, o membro é apenas simulado. Para adicionar de verdade no Discord, é necessário um backend com bot.</p>
+      <form id="member-form" class="space-y-4">
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">Nome</label>
+          <input type="text" id="member-name" required placeholder="Nome do membro" class="w-full px-4 py-2.5 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition">
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">Cargo</label>
+          <select id="member-role" class="w-full px-4 py-2.5 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-none focus:border-cyan-500/50 transition">
+            <option>Monitor de Integração</option>
+            <option>Analista</option>
+            <option>Administrador</option>
+            <option>Pendente</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">ID do Discord (opcional)</label>
+          <input type="text" id="member-id" placeholder="123456789012345678" class="w-full px-4 py-2.5 rounded-xl bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition">
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeMemberModal()" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition text-sm">Cancelar</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 transition text-sm">Adicionar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ===================== CONFIGURAÇÕES =====================
+    const CLIENT_ID = '1573684369279946782';
+    const GUILD_ID = '1329544134272356512';
+    const ADMIN_USER_ID = '552947639025401888';
+    const ALLOWED_ROLE_IDS = [
+      '1329545094163988510',
+      '1412247141505699981'
+    ];
+
+    // Configure aqui a URL exata do site. Exemplos:
+    // const REDIRECT_URI = 'https://seuusuario.github.io/portal-smi';
+    // const REDIRECT_URI = 'https://portal-smi.vercel.app';
+    const REDIRECT_URI = window.location.origin + window.location.pathname.replace(/\/$/, '');
+
+    const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=identify%20guilds.members.read`;
+
+    // ===================== CONTEÚDO POR USUÁRIO =====================
+    const USER_PAGES = {
+      '552947639025401888': {
+        role: 'Administrador Geral',
+        quickAccess: [
+          { label: 'Painel Administrativo', page: 'admin', color: 'rose' },
+          { label: 'Monitor de Integrações', page: 'monitor', color: 'cyan' },
+          { label: 'Gerenciar Materiais', page: 'admin', color: 'emerald' },
+          { label: 'Regimento SMI', page: 'regimento', color: 'pink' },
+        ],
+        announcements: [
+          { title: 'Novo portal operacional no ar', date: 'Hoje', type: 'success' },
+          { title: 'Reunião de alinhamento: segunda, 08:00', date: 'Hoje', type: 'info' },
+        ],
+        integrations: [
+          { name: 'ERP Corporativo', status: 'online', latency: '42ms', uptime: '99.9%' },
+          { name: 'Sistema de Tickets', status: 'online', latency: '28ms', uptime: '99.7%' },
+          { name: 'Dashboard BI', status: 'online', latency: '55ms', uptime: '99.5%' },
+          { name: 'API de Notificações', status: 'online', latency: '15ms', uptime: '99.9%' },
+          { name: 'Gateway de Pagamentos', status: 'offline', latency: '-', uptime: '92.1%' },
+        ],
+        materials: [
+          { title: 'Política de Acesso', type: 'PDF', size: '1.8 MB', tag: 'Normativo', link: '#' },
+          { title: 'Relatório Mensal', type: 'XLSX', size: '2.1 MB', tag: 'Gestão', link: '#' },
+          { title: 'Plano de Contingência', type: 'PDF', size: '3.5 MB', tag: 'Crítico', link: '#' },
+          { title: 'Manual do Administrador', type: 'PDF', size: '1.2 MB', tag: 'Obrigatório', link: '#' },
+        ],
+        regimento: `
+          <h3 class="text-xl font-bold text-white">1. Governança do SMI</h3>
+          <p>A gestão do SMI é responsabilidade da diretoria operacional, que define os indicadores, SLAs e permissões de acesso aos ambientes.</p>
+          <h3 class="text-xl font-bold text-white mt-6">2. Gestão de Acessos</h3>
+          <p>O administrador deve revisar trimestralmente os aprovados, garantindo o princípio do menor privilégio e a rastreabilidade das ações.</p>
+          <h3 class="text-xl font-bold text-white mt-6">3. Compliance</h3>
+          <p>Todas as integrações devem estar documentadas, com owners definidos e planos de rollback testados semestralmente.</p>
+          <h3 class="text-xl font-bold text-white mt-6">4. Poderes do Administrador</h3>
+          <p>O administrador geral possui liberdade total sobre o portal, podendo atualizar materiais, visualizar logins e gerenciar membros conforme necessidade operacional.</p>
+        `
+      }
+    };
+
+    const DEFAULT_PAGE = {
+      role: 'Membro Autorizado',
+      quickAccess: [
+        { label: 'Monitor de Integração', page: 'monitor', color: 'cyan' },
+        { label: 'Meus Materiais', page: 'materiais', color: 'purple' },
+        { label: 'Regimento SMI', page: 'regimento', color: 'pink' },
+      ],
+      announcements: [
+        { title: 'Bem-vindo ao novo portal operacional', date: 'Hoje', type: 'info' },
+      ],
+      integrations: [
+        { name: 'Portal SMI', status: 'online', latency: '12ms', uptime: '99.9%' },
+      ],
+      materials: [
+        { title: 'Regimento SMI', type: 'PDF', size: '850 KB', tag: 'Normativo', link: '#' },
+      ],
+      regimento: `
+        <h3 class="text-xl font-bold text-white">1. Apresentação</h3>
+        <p>O Regimento SMI estabelece as normas de uso do portal operacional. Consulte a equipe responsável para solicitar acesso a materiais adicionais.</p>
+      `
+    };
+
+    // ===================== DADOS EM MEMÓRIA (SIMULAÇÃO) =====================
+    let loginHistory = [];
+    let membersList = [
+      { id: '987654321098765432', name: 'Monitor Silva', role: 'Monitor de Integração', status: 'active' },
+      { id: '876543210987654321', name: 'Ana Souza', role: 'Analista', status: 'active' },
+      { id: '765432109876543210', name: 'Carlos Lima', role: 'Pendente', status: 'pending' },
+    ];
+    let materialsList = [...DEFAULT_PAGE.materials];
+
+    // ===================== ELEMENTOS =====================
+    const screens = {
+      login: document.getElementById('login-screen'),
+      loading: document.getElementById('loading-screen'),
+      unauthorized: document.getElementById('unauthorized-screen'),
+      dashboard: document.getElementById('dashboard-app'),
+    };
+
+    const els = {
+      setupAlert: document.getElementById('setup-alert'),
+      btnLogin: document.getElementById('btn-login'),
+      btnLogout: document.getElementById('btn-logout'),
+      btnLogoutDenied: document.getElementById('btn-logout-denied'),
+      userAvatar: document.getElementById('user-avatar'),
+      userName: document.getElementById('user-name'),
+      userRole: document.getElementById('user-role'),
+      welcomeName: document.getElementById('welcome-name'),
+      pages: document.querySelectorAll('.page'),
+      navItems: document.querySelectorAll('.nav-item'),
+    };
+
+    let isCurrentUserAdmin = false;
+    let currentUser = null;
+    let accessToken = null;
+
+    // ===================== UTILITÁRIOS =====================
+    function showScreen(name) {
+      Object.values(screens).forEach(s => s.classList.add('hidden'));
+      screens[name].classList.remove('hidden');
+    }
+
+    function logout() {
+      accessToken = null;
+      currentUser = null;
+      history.pushState('', document.title, window.location.pathname + window.location.search);
+      showScreen('login');
+    }
+
+    function parseHashParams() {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      return {
+        token: params.get('access_token'),
+        tokenType: params.get('token_type'),
+        expiresIn: params.get('expires_in'),
+      };
+    }
+
+    function getUserContent(userId) {
+      return USER_PAGES[userId] || DEFAULT_PAGE;
+    }
+
+    function statusColor(status) {
+      return {
+        online: 'bg-emerald-400',
+        warning: 'bg-amber-400',
+        offline: 'bg-red-500'
+      }[status] || 'bg-slate-400';
+    }
+
+    function statusLabel(status) {
+      return { online: 'Online', warning: 'Instável', offline: 'Offline' }[status] || status;
+    }
+
+    function typeColor(type) {
+      return {
+        info: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-300',
+        warning: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
+        success: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
+      }[type] || 'border-slate-500/30 bg-slate-500/10 text-slate-300';
+    }
+
+    function formatDate(date = new Date()) {
+      return new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      }).format(date);
+    }
+
+    function showToast(message, type = 'info') {
+      const colors = {
+        info: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-300',
+        success: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
+        warning: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
+        error: 'border-red-500/30 bg-red-500/10 text-red-300',
+      };
+      const toast = document.createElement('div');
+      toast.className = `fixed top-6 right-6 z-50 px-5 py-3 rounded-xl border shadow-lg backdrop-blur-md ${colors[type]} fade-in flex items-center gap-3 max-w-sm`;
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-current shadow-[0_0_8px_currentColor]"></span>
+        <span class="text-sm font-medium">${message}</span>
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // ===================== RENDERIZAÇÃO =====================
+    function renderDashboard(content) {
+      const alertCount = content.integrations.filter(i => i.status !== 'online').length;
+      document.getElementById('metric-integracoes').textContent = content.integrations.length;
+      document.getElementById('metric-materiais').textContent = content.materials.length;
+      document.getElementById('metric-alertas').textContent = alertCount;
+
+      document.getElementById('quick-access').innerHTML = content.quickAccess.map(item => `
+        <button onclick="navigateTo('${item.page}')" class="file-card w-full p-4 rounded-xl border border-white/10 flex items-center justify-between text-left group">
+          <div class="flex items-center gap-3">
+            <span class="w-2 h-2 rounded-full bg-${item.color}-400 shadow-[0_0_10px_currentColor]"></span>
+            <span class="font-medium group-hover:text-${item.color}-300 transition">${item.label}</span>
+          </div>
+          <svg class="w-5 h-5 text-slate-500 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+      `).join('');
+
+      document.getElementById('announcements').innerHTML = content.announcements.map(a => `
+        <div class="p-4 rounded-xl border ${typeColor(a.type)}">
+          <div class="flex items-start justify-between gap-4">
+            <p class="font-medium">${a.title}</p>
+            <span class="text-xs opacity-70 whitespace-nowrap">${a.date}</span>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('integrations-list').innerHTML = content.integrations.map(int => `
+        <div class="flex items-center justify-between p-4 rounded-xl bg-black/20 border border-white/5">
+          <div class="flex items-center gap-3">
+            <span class="status-dot ${statusColor(int.status)}"></span>
+            <div>
+              <p class="font-semibold">${int.name}</p>
+              <p class="text-xs text-slate-400 mono">${int.latency} · uptime ${int.uptime}</p>
+            </div>
+          </div>
+          <span class="text-xs font-medium px-3 py-1 rounded-full ${int.status === 'online' ? 'bg-emerald-500/10 text-emerald-400' : int.status === 'warning' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}">
+            ${statusLabel(int.status)}
+          </span>
+        </div>
+      `).join('');
+
+      const onlineCount = content.integrations.filter(i => i.status === 'online').length;
+      const health = Math.round((onlineCount / content.integrations.length) * 100) || 0;
+      const healthEl = document.getElementById('health-score');
+      healthEl.textContent = health + '%';
+      healthEl.className = `text-3xl font-bold ${health >= 95 ? 'text-emerald-400' : health >= 80 ? 'text-amber-400' : 'text-red-400'}`;
+      const circle = document.getElementById('health-circle');
+      circle.style.strokeDashoffset = 283 - (283 * health) / 100;
+      circle.style.stroke = health >= 95 ? '#10b981' : health >= 80 ? '#f59e0b' : '#ef4444';
+
+      document.getElementById('activity-log').innerHTML = content.integrations.map(int => `
+        <div class="flex items-center gap-3 pb-3 border-b border-white/5 last:border-0">
+          <span class="status-dot ${statusColor(int.status)}"></span>
+          <span class="flex-1">${int.name}</span>
+          <span class="text-slate-500 mono text-xs">${int.status === 'online' ? 'Sincronizado' : int.status === 'warning' ? 'Latência alta' : 'Falha detectada'}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('materials-grid').innerHTML = content.materials.map(mat => `
+        <a href="${mat.link || '#'}" target="_blank" class="file-card glass-panel rounded-2xl p-6 border border-white/10 cursor-pointer block hover:no-underline">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-sm">
+              ${mat.type}
+            </div>
+            <span class="text-xs px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">${mat.tag}</span>
+          </div>
+          <h3 class="font-bold text-lg mb-1 text-white">${mat.title}</h3>
+          <p class="text-sm text-slate-400 mono">${mat.size}</p>
+        </a>
+      `).join('');
+
+      document.getElementById('regimento-content').innerHTML = content.regimento;
+
+      if (isCurrentUserAdmin) renderAdmin();
+    }
+
+    function renderAdmin() {
+      document.getElementById('admin-total-logins').textContent = loginHistory.length;
+      document.getElementById('admin-total-members').textContent = membersList.length;
+      document.getElementById('admin-active-materials').textContent = materialsList.length;
+      document.getElementById('admin-system-alerts').textContent = document.getElementById('metric-alertas').textContent;
+
+      document.getElementById('admin-login-table').innerHTML = loginHistory.map(login => `
+        <tr class="border-b border-white/5 table-row-hover transition">
+          <td class="py-3 px-4 text-sm text-slate-300">${login.name}</td>
+          <td class="py-3 px-4 text-sm text-slate-400 mono">${login.role}</td>
+          <td class="py-3 px-4 text-sm text-slate-500 mono">${formatDate(new Date(login.time))}</td>
+          <td class="py-3 px-4 text-xs">
+            <span class="px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Sucesso</span>
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('admin-members-list').innerHTML = membersList.map((member, idx) => `
+        <div class="flex items-center justify-between p-4 rounded-xl bg-black/20 border border-white/5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-600/20 flex items-center justify-center text-cyan-300 font-bold text-xs">
+              ${member.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <p class="font-semibold text-sm">${member.name}</p>
+              <p class="text-xs text-slate-400 mono">${member.role}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2 py-1 rounded-full border ${member.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}">
+              ${member.status === 'active' ? 'Ativo' : 'Pendente'}
+            </span>
+            <button onclick="toggleMemberStatus(${idx})" class="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition" title="Alterar status">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
+            <button onclick="removeMember(${idx})" class="p-2 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition" title="Remover">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('admin-materials-table').innerHTML = materialsList.map((mat, idx) => `
+        <tr class="border-b border-white/5 table-row-hover transition">
+          <td class="py-3 px-4 text-sm text-slate-300">${mat.title}</td>
+          <td class="py-3 px-4 text-sm text-slate-400 mono">${mat.type}</td>
+          <td class="py-3 px-4 text-sm text-slate-400">${mat.tag}</td>
+          <td class="py-3 px-4 text-sm text-slate-500 mono">${mat.size}</td>
+          <td class="py-3 px-4">
+            <button onclick="removeMaterial(${idx})" class="text-xs px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 transition">Remover</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function navigateTo(pageId) {
+      els.pages.forEach(p => p.classList.add('hidden'));
+      document.getElementById('page-' + pageId).classList.remove('hidden');
+
+      els.navItems.forEach(n => n.classList.remove('active'));
+      document.querySelector(`[data-page="${pageId}"]`)?.classList.add('active');
+
+      if (pageId === 'admin' && isCurrentUserAdmin) renderAdmin();
+    }
+
+    window.navigateTo = navigateTo;
+
+    // ===================== AÇÕES ADMIN =====================
+    window.openMemberModal = function() {
+      document.getElementById('member-modal').classList.remove('hidden');
+    };
+
+    window.closeMemberModal = function() {
+      document.getElementById('member-modal').classList.add('hidden');
+      document.getElementById('member-form').reset();
+    };
+
+    window.toggleMemberStatus = function(idx) {
+      membersList[idx].status = membersList[idx].status === 'active' ? 'pending' : 'active';
+      renderAdmin();
+      showToast(`Status de ${membersList[idx].name} atualizado`, 'success');
+    };
+
+    window.removeMember = function(idx) {
+      const name = membersList[idx].name;
+      membersList.splice(idx, 1);
+      renderAdmin();
+      showToast(`${name} removido da lista`, 'warning');
+    };
+
+    window.removeMaterial = function(idx) {
+      const title = materialsList[idx].title;
+      materialsList.splice(idx, 1);
+      const content = getUserContent(currentUser?.id);
+      content.materials = materialsList;
+      renderDashboard(content);
+      showToast(`${title} removido`, 'warning');
+    };
+
+    window.exportLogins = function() {
+      if (!loginHistory.length) return showToast('Nenhum login para exportar', 'warning');
+      const csv = [
+        ['Usuario', 'Cargo', 'Horario', 'Status'],
+        ...loginHistory.map(l => [l.name, l.role, new Date(l.time).toISOString(), 'Sucesso'])
+      ].map(row => row.join(',')).join('\n');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `logins-smi-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Logins exportados com sucesso', 'success');
+    };
+
+    document.getElementById('member-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('member-name').value.trim();
+      const role = document.getElementById('member-role').value;
+      const id = document.getElementById('member-id').value.trim() || String(Date.now());
+      if (!name) return;
+      membersList.unshift({ id, name, role, status: 'active' });
+      renderAdmin();
+      closeMemberModal();
+      showToast(`${name} adicionado com sucesso`, 'success');
+    });
+
+    document.getElementById('material-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('mat-title').value.trim();
+      const type = document.getElementById('mat-type').value;
+      const tag = document.getElementById('mat-category').value;
+      const size = document.getElementById('mat-size').value.trim();
+      const link = document.getElementById('mat-link').value.trim();
+      if (!title || !size || !link) return;
+      const newMat = { title, type, size, tag, link };
+      materialsList.unshift(newMat);
+      const content = getUserContent(currentUser?.id);
+      content.materials = materialsList;
+      renderDashboard(content);
+      e.target.reset();
+      showToast('Material publicado com sucesso', 'success');
+    });
+
+    // ===================== API DISCORD =====================
+    async function fetchDiscordUser() {
+      const res = await fetch('https://discord.com/api/v10/users/@me', {
+        headers: { Authorization: accessToken }
+      });
+      if (!res.ok) throw new Error('Falha ao buscar usuário');
+      return res.json();
+    }
+
+    async function fetchGuildMember() {
+      const res = await fetch(`https://discord.com/api/v10/users/@me/guilds/${GUILD_ID}/member`, {
+        headers: { Authorization: accessToken }
+      });
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error('Falha ao buscar membro do servidor');
+      return res.json();
+    }
+
+    // ===================== FLUXO PRINCIPAL =====================
+    async function handleAuth() {
+      const hash = parseHashParams();
+      if (!hash.token) return showScreen('login');
+
+      accessToken = `${hash.tokenType || 'Bearer'} ${hash.token}`;
+      showScreen('loading');
+
+      try {
+        const user = await fetchDiscordUser();
+        const member = await fetchGuildMember();
+
+        const isAdmin = user.id === ADMIN_USER_ID;
+        const hasAllowedRole = member && member.roles && ALLOWED_ROLE_IDS.some(roleId => member.roles.includes(roleId));
+
+        if (isAdmin || hasAllowedRole) {
+          currentUser = user;
+          isCurrentUserAdmin = isAdmin;
+          const content = getUserContent(user.id);
+
+          const avatarUrl = user.avatar
+            ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+            : `https://cdn.discordapp.com/embed/avatars/${Number(user.discriminator || 0) % 5}.png`;
+
+          els.userAvatar.src = avatarUrl;
+          els.userName.textContent = user.global_name || user.username;
+          els.userRole.textContent = isAdmin ? 'Administrador' : content.role;
+          els.welcomeName.textContent = user.global_name || user.username;
+
+          // Registra login
+          loginHistory.unshift({
+            id: user.id,
+            name: user.global_name || user.username,
+            role: isAdmin ? 'Administrador' : content.role,
+            time: Date.now()
+          });
+
+          const adminNav = document.querySelector('[data-page="admin"]');
+          if (adminNav) adminNav.classList.toggle('hidden', !isAdmin);
+
+          // Se for admin, sincroniza materiais
+          if (isAdmin) {
+            materialsList = [...content.materials];
+          }
+
+          renderDashboard(content);
+          showScreen('dashboard');
+          showToast(isAdmin ? 'Bem-vindo, Administrador' : 'Acesso autorizado', 'success');
+        } else {
+          document.getElementById('unauth-guild-id').textContent = GUILD_ID;
+          showScreen('unauthorized');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Erro ao verificar acesso: ' + err.message, 'error');
+        logout();
+      }
+    }
+
+    // ===================== EVENTOS =====================
+    els.btnLogin.addEventListener('click', () => {
+      window.location.href = DISCORD_AUTH_URL;
+    });
+
+    els.btnLogout.addEventListener('click', logout);
+    els.btnLogoutDenied.addEventListener('click', logout);
+
+    els.navItems.forEach(btn => {
+      btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+    });
+
+    // Valida configuração
+    if (!CLIENT_ID.includes('SUA_')) {
+      els.setupAlert.classList.add('hidden');
+    }
+
+    handleAuth();
+  </script>
+</body>
+</html>
