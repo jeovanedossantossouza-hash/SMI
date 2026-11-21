@@ -1421,7 +1421,8 @@
 
     document.getElementById("probation-evaluation-form").addEventListener("submit", async (event) => {
       event.preventDefault();
-      const button = event.currentTarget.querySelector('button[type="submit"]');
+      const form = event.currentTarget;
+      const button = form.querySelector('button[type="submit"]');
       button.disabled = true;
       button.textContent = "Registrando...";
       const payload = {
@@ -1438,7 +1439,7 @@
       };
       try {
         const result = await apiRequest("/api/evaluations", { method: "POST", body: payload });
-        event.currentTarget.reset();
+        form.reset();
         calculateEvaluationPreview();
         showToast("Avaliação registrada. O RH já pode consultar o parecer.", "success");
         if (isCurrentUserHR) loadRHEvaluations();
