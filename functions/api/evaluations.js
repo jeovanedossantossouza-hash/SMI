@@ -28,6 +28,7 @@ export async function onRequestGet({ request, env }) {
             average, verdict, observations,
             created_by_id, created_by_name, created_at, updated_at
      FROM evaluations
+     WHERE deleted_at IS NULL
      ORDER BY updated_at DESC`
   ).all();
 
