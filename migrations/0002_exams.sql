@@ -28,3 +28,12 @@ CREATE TABLE IF NOT EXISTS exam_attempts (
   UNIQUE(exam_id, discord_id)
 );
 CREATE INDEX IF NOT EXISTS idx_exam_attempts_exam ON exam_attempts(exam_id, submitted_at DESC);
+
+CREATE TABLE IF NOT EXISTS exam_profiles (
+  discord_id TEXT PRIMARY KEY,
+  discord_name TEXT NOT NULL,
+  full_name TEXT NOT NULL,
+  rg TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
