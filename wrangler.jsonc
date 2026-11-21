@@ -2,5 +2,5 @@
   "$schema": "https://developers.cloudflare.com/schemas/wrangler.json",
   "name": "smi",
   "compatibility_date": "2026-11-21",
-  "pages_build_output_dir": "."
+  "pages_build_output_dir": "/public"
 }
